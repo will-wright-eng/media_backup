@@ -32,20 +32,21 @@ def import_configs():
     config = configparser.ConfigParser()
     config.read('project.cfg')
     bucket_name = config['s3_info']['bucket']
-    key_name = config['s3_info']['key_path']
+    key_path = config['s3_info']['key_path']
     media_dir = config['s3_info']['media_dir']
-    return bucket_name, key_name, media_dir
+    return bucket_name, key_path, media_dir
 
-def upload_to_s3(file_name, bucket_name, key_name):
-    key = key_name + '/' + file_name
-    s3 = boto3.client('s3')
-    statinfo = os.stat(file_name)
-    up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
-    up_progress.start()
-    def upload_progress(chunk):
-        up_progress.update(up_progress.currval + chunk)
-    s3.upload_file(file_name, bucket_name, key, Callback=upload_progress)
-    up_progress.finish()
+def upload_to_s3(path_output, bucket_name, key_path):
+	file_name = path_output.split('/')[-1]
+	object_name = key_path + '/' + file_name
+	s3 = boto3.client('s3')
+	statinfo = os.stat(path_output)
+	up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
+	up_progress.start()
+	def upload_progress(chunk):
+		up_progress.update(up_progress.currval + chunk)
+	s3.upload_file(path_output, bucket_name, object_name, Callback=upload_progress)
+	up_progress.finish()
 
 def move_uploaded_file(cwd,filename):
     # move files
@@ -54,7 +55,7 @@ def move_uploaded_file(cwd,filename):
     os.rename(cwd+'/'+filename,cwd+'/'+folder_moveto+'/'+filename)
 
 def main():
-	bucket_name, key_name, media_dir = import_configs()
+	bucket_name, key_path, media_dir = import_configs()
 	files = os.listdir(media_dir)
 	remove_files = [i for i in files if (i[0]=='_') or (i[0]=='.') or ('Untitled' in i) or ('.zip' in i)]
 	file_list = [i for i in files if i not in remove_files][:5]
@@ -64,7 +65,7 @@ def main():
 		logger.info('compressing')
 		path_output = zip_process(media_dir, file_name)
 		logger.info('start upload of '+path_output)
-		upload_to_s3(path_output, bucket_name, key_name)
+		upload_to_s3(path_output, bucket_name, key_path)
 		logger.info('upload complete')
 		move_uploaded_file(media_dir, file_name)
 		move_uploaded_file(media_dir, path_output)
