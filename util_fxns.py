@@ -1,8 +1,14 @@
+'''
+utility functions for general use
+Author: William Wright
+'''
+
 import inspect
 import logging
 
 
 def function_logger(file_level, console_level=None, function_name=None):
+    '''function_logger docstring'''
     if function_name == None:
         function_name = inspect.stack()[1][3]
     logger = logging.getLogger(function_name)
@@ -22,3 +28,12 @@ def function_logger(file_level, console_level=None, function_name=None):
     fh.setFormatter(fh_format)
     logger.addHandler(fh)
     return logger
+
+
+def create_directory(folders):
+    '''create_directory docstring'''
+    for folder in folders:
+        try:
+            os.mkdir(folder)
+        except FileExistsError as e:
+            print(e)
