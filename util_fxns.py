@@ -3,6 +3,7 @@ utility functions for general use
 Author: William Wright
 '''
 
+import os
 import inspect
 import logging
 
@@ -30,10 +31,13 @@ def function_logger(file_level, console_level=None, function_name=None):
     return logger
 
 
-def create_directory(folders):
+def create_directory(folders, logger=None):
     '''create_directory docstring'''
     for folder in folders:
         try:
             os.mkdir(folder)
         except FileExistsError as e:
-            print(e)
+            if logger:
+                logger.info(e)
+            else:
+                print(e)

@@ -49,9 +49,9 @@ def upload_to_s3(path_output, bucket_name, key_path):
 
     up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
     up_progress.start()
+
     def upload_progress(chunk):
         up_progress.update(up_progress.currval + chunk)
-        logger.info(up_progress.currval + chunk)
 
     s3.upload_file(path_output,
                    bucket_name,
@@ -61,8 +61,7 @@ def upload_to_s3(path_output, bucket_name, key_path):
 
 
 def move_uploaded_file(cwd, file_name, move_to):
-    move_to = '_uploaded_to_s3'
-    utilf.create_directory([folder_moveto])
+    utilf.create_directory([move_to], logger)
     os.rename(cwd + '/' + file_name, cwd + '/' + move_to + '/' + file_name)
 
 
@@ -73,7 +72,7 @@ def main():
         i for i in files
         if (i[0] == '_') or (i[0] == '.') or ('Untitled' in i) or ('.zip' in i)
     ]
-    file_list = [i for i in files if i not in remove_files][1:5]
+    file_list = [i for i in files if i not in remove_files][:10]
 
     for file_name in file_list:
         logger.info(file_name)
