@@ -63,3 +63,6 @@ up_progress.finish()
    ]
 }
 ```
+
+## TODO
+- add check to see if key already exists, if so then compare size of each
