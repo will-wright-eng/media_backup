@@ -18,9 +18,10 @@ import configparser
 
 import util_fxns as utilf
 
+__name__ = 'media_backup'
 logger = utilf.function_logger(logging.DEBUG,
                                logging.DEBUG,
-                               function_name='media_backup')
+                               function_name=__name__)
 
 
 def zip_process(cwd, file_name):
@@ -61,7 +62,7 @@ def upload_to_s3(path_output, bucket_name, key_path):
 
 
 def move_uploaded_file(cwd, file_name, move_to):
-    utilf.create_directory([move_to], logger)
+    utilf.create_directory([cwd + '/' + move_to], logger)
     os.rename(cwd + '/' + file_name, cwd + '/' + move_to + '/' + file_name)
 
 
@@ -72,16 +73,25 @@ def main():
         i for i in files
         if (i[0] == '_') or (i[0] == '.') or ('Untitled' in i) or ('.zip' in i)
     ]
-    file_list = [i for i in files if i not in remove_files][:10]
-
+    file_list = [i for i in files if i not in remove_files]
+    flag_nozip = False
     for file_name in file_list:
         logger.info(file_name)
         logger.info('compressing')
-        path_output = zip_process(media_dir, file_name)
-
+        
+        try:
+            path_output = zip_process(media_dir, file_name)
+        except NotADirectoryError as e:
+            flag_nozip = True
+            path_output = os.path.join(media_dir, file_name)
+            logger.info(e)
         upload_to_s3(path_output, bucket_name, key_path)
         logger.info('upload complete')
-        move_uploaded_file(media_dir, file_name, move_to)
+
+        if flag_nozip:
+            flag_nozip = False
+        else:
+            move_uploaded_file(media_dir, file_name, move_to)
         move_uploaded_file(media_dir, path_output.split('/')[-1], move_to)
 
     logger.info('program successful')
