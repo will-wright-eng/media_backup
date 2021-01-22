@@ -18,10 +18,10 @@ import configparser
 
 import util_fxns as utilf
 
-__name__ = 'media_backup'
+name = 'media_backup'
 logger = utilf.function_logger(logging.DEBUG,
                                logging.DEBUG,
-                               function_name=__name__)
+                               function_name=name)
 
 
 def zip_process(cwd, file_name):
