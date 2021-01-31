@@ -12,16 +12,14 @@ import shutil
 import logging
 import inspect
 
-import progressbar
-import boto3
 import configparser
 
 import util_fxns as utilf
 
-__name__ = 'media_backup'
+name = 'media_backup'
 logger = utilf.function_logger(logging.DEBUG,
                                logging.DEBUG,
-                               function_name=__name__)
+                               function_name=name)
 
 
 def zip_process(cwd, file_name):
@@ -37,28 +35,6 @@ def import_configs():
     config_dir = dict(config.items('dir_info'))
     return config_s3['bucket'], config_s3['key_path'], config_dir[
         'media_dir'], config_dir['move_to']
-
-
-def upload_to_s3(path_output, bucket_name, key_path):
-    '''upload_to_s3 docstring'''
-    file_name = path_output.split('/')[-1]
-    object_name = key_path + '/' + file_name
-    s3 = boto3.client('s3')
-    statinfo = os.stat(path_output)
-    logger.info('uploading file:\t' + file_name)
-    logger.info('uploading destination:\t' + object_name)
-
-    up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
-    up_progress.start()
-
-    def upload_progress(chunk):
-        up_progress.update(up_progress.currval + chunk)
-
-    s3.upload_file(path_output,
-                   bucket_name,
-                   object_name,
-                   Callback=upload_progress)
-    up_progress.finish()
 
 
 def move_uploaded_file(cwd, file_name, move_to):
@@ -85,7 +61,7 @@ def main():
             flag_nozip = True
             path_output = os.path.join(media_dir, file_name)
             logger.info(e)
-        upload_to_s3(path_output, bucket_name, key_path)
+        utilf.upload_to_s3(path_output, bucket_name, key_path, logger)
         logger.info('upload complete')
 
         if flag_nozip:
