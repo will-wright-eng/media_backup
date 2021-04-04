@@ -55,14 +55,15 @@ def upload_to_s3(path_output, bucket_name, key_path, logger=None):
         logger.info('uploading file:\t' + file_name)
         logger.info('uploading destination:\t' + object_name)
 
-    up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
-    up_progress.start()
+    # up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
+    # up_progress.start()
 
-    def upload_progress(chunk):
-        up_progress.update(up_progress.currval + chunk)
+    # def upload_progress(chunk):
+    #     up_progress.update(up_progress.currval + chunk)
 
     s3.upload_file(path_output,
                    bucket_name,
-                   object_name,
-                   Callback=upload_progress)
-    up_progress.finish()
+                   object_name)
+                   # ,
+                   # Callback=upload_progress)
+    # up_progress.finish()
