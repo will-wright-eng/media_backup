@@ -66,3 +66,16 @@ up_progress.finish()
 
 ## TODO
 - add check to see if key already exists, if so then compare size of each
+- add wraper that treats `aws s3` as a simple service to upload, download, search_keyword, get_status (storage tier & recovery status), and recover (from glacier)
+
+`<keyword>`
+```bash
+aws s3 ls media-backup-files/media_uploads/ | grep "<keyword>"
+```
+
+`<filename>`
+recovery tier = Expedited
+recovery days = 10
+```bash
+aws s3api restore-object --bucket media-backup-files --key media_uploads/<filename>.zip --restore-request '{"Days":10,"GlacierJobParameters":{"Tier":"Expedited"}}'
+```
