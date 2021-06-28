@@ -2,8 +2,8 @@
 backup large media files to S3 bucket
 
 ## Table of Contents
-1. [Summary](README.md#summary)
-2. [Resources](README.md#resources)
+- [Summary](README.md#summary)
+- [Resources](README.md#resources)
 
 ## Summary
 
