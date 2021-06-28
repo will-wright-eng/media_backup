@@ -11,71 +11,39 @@ Kept getting an `AccessDenied` error when attempting a `CreateMultipartUpload` a
 
 In my experience the `Callback` parameter in `s3.upload_file` tends to cause more problems than solve([docs](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html#the-callback-parameter)).
 
-## Resources
-
+## Resources used
 - [SO Post](https://stackoverflow.com/a/53826161/14343465)
-
-```python
-import boto3, os
-import progressbar
-
-bucket_name = "<your-s3-bucket-name>"
-folder_name = "<your-directory-name-locally>"
-file_name = "<your-filename-locally>"
-path = folder_name + "/" + file_name
-s3 = boto3.client('s3', aws_access_key_id="<your_aws_access_key_id>", aws_secret_access_key="<your_aws_secret_access_key>")
-
-statinfo = os.stat(file_name)
-
-up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
-
-up_progress.start()
-
-def upload_progress(chunk):
-    up_progress.update(up_progress.currval + chunk)
-
-s3.upload_file(file_name, bucket_name, path, Callback=upload_progress)
-
-up_progress.finish()
-```
-
 - [AWS S3 Bucket Permissions](https://aws.amazon.com/premiumsupport/knowledge-center/s3-console-access-certain-bucket/)
-
-```bash
-{
-   "Version":"2012-10-17",
-   "Statement":[
-      {
-         "Effect":"Allow",
-         "Action":[
-            "s3:ListBucket"
-         ],
-         "Resource":"arn:aws:s3:::DOC-EXAMPLE-BUCKET"
-      },
-      {
-         "Effect":"Allow",
-         "Action":[
-            "s3:PutObject",
-            "s3:GetObject"
-         ],
-         "Resource":"arn:aws:s3:::DOC-EXAMPLE-BUCKET/*"
-      }
-   ]
-}
-```
 
 ## TODO
 - add check to see if key already exists, if so then compare size of each
 - add wraper that treats `aws s3` as a simple service to upload, download, search_keyword, get_status (storage tier & recovery status), and recover (from glacier)
 
+`<bucket>`
+
 `<keyword>`
 ```bash
-aws s3 ls media-backup-files/media_uploads/ | grep "<keyword>"
+aws s3 ls <bucket>/media_uploads/ | grep "<keyword>"
 ```
 
 `<filename>`
-recovery tier = Expedited
-recovery days = 10
+- recovery tier = Expedited
+- recovery days = 10
 ```bash
-aws s3api restore-object --bucket media-backup-files --key media_uploads/<filename>.zip --restore-request '{"Days":10,"GlacierJobParameters":{"Tier":"Expedited"}}'
+aws s3api restore-object --bucket <bucket> --key media_uploads/<filename> --restore-request '{"Days":10,"GlacierJobParameters":{"Tier":"Expedited"}}'
+
+#eg
+aws s3api restore-object --bucket <bucket> --key media_uploads/Harry_Potter.zip --restore-request '{"Days":10,"GlacierJobParameters":{"Tier":"Expedited"}}'
+```
+
+`<check_status>`
+```bash
+#eg
+aws s3api head-object --bucket <bucket> --key media_uploads/<filename>
+```
+
+`<download>`
+```bash
+#eg
+aws s3 cp s3://<bucket>/media_uploads/<filename> <filename>
 ```
