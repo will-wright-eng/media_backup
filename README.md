@@ -9,7 +9,7 @@ backup large media files to S3 bucket
 
 Kept getting an `AccessDenied` error when attempting a `CreateMultipartUpload` as per [this post](https://stackoverflow.com/a/50118024/14343465), which should have been solved by [modifying permissions](https://stackoverflow.com/questions/52541933/accessdenied-when-calling-the-createmultipartupload-operation-in-django-using-dj) -- alas, no such luck. So I went the slow route.
 
-In my experience the `Callback` parameter in `s3.upload_file` tends to cause more problems than solve([docs](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html#the-callback-parameter)).
+In my experience the `Callback` parameter in `s3.upload_file` tends to cause more problems than it solves ([docs](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html#the-callback-parameter)).
 
 ## Resources used
 - [SO Post](https://stackoverflow.com/a/53826161/14343465)
