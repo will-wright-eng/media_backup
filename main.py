@@ -31,10 +31,9 @@ def zip_process(cwd, file_name):
 def import_configs():
     config = configparser.ConfigParser()
     config.read('project.cfg')
-    config_s3 = dict(config.items('s3_info'))
-    config_dir = dict(config.items('dir_info'))
-    return config_s3['bucket'], config_s3['key_path'], config_dir[
-        'media_dir'], config_dir['move_to']
+    configs = dict(config.items('media_s3_info'))
+    return configs['s3_bucket'], configs['s3_key_path'], configs[
+        'local_dir'], configs['local_move_to']
 
 
 def move_uploaded_file(cwd, file_name, move_to):

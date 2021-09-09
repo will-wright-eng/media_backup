@@ -46,14 +46,18 @@ def create_directory(folders, logger=None):
 
 
 def upload_to_s3(path_output, bucket_name, key_path, logger=None):
-    '''upload_to_s3 docstring'''
+    '''
+    path_output: local dir file path 
+    bucket_name: name of s3 bucket 
+    key_path: key path + file name = object name
+    '''
     file_name = path_output.split('/')[-1]
     object_name = key_path + '/' + file_name
     s3 = boto3.client('s3')
-    statinfo = os.stat(path_output)
-    if logger:
-        logger.info('uploading file:\t' + file_name)
-        logger.info('uploading destination:\t' + object_name)
+    # statinfo = os.stat(path_output)
+    # if logger:
+    #     logger.info('uploading file:\t' + file_name)
+    #     logger.info('uploading destination:\t' + object_name)
 
     # up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
     # up_progress.start()
@@ -67,3 +71,16 @@ def upload_to_s3(path_output, bucket_name, key_path, logger=None):
                    # ,
                    # Callback=upload_progress)
     # up_progress.finish()
+
+
+def upload_to_s3_v2(local_path: str, bucket_name: str, object_name: str):
+    '''
+    path_output: local dir file path 
+    bucket_name: name of s3 bucket 
+    key_path: key path + file name = object name
+    '''
+    s3 = boto3.client('s3')
+    response = s3.upload_file(local_path,
+                               bucket_name,
+                               object_name)
+    return response
